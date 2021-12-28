@@ -1,6 +1,15 @@
 const rawData = {
 	title: "Nöbet Listesi",
 	dates: [
+		"01.12.2021",
+		"02.12.2021",
+		"03.12.2021",
+		"04.12.2021",
+		"05.12.2021",
+		"06.12.2021",
+		"07.12.2021",
+		"08.12.2021",
+		"09.12.2021",
 		"10.12.2021",
 		"11.12.2021",
 		"12.12.2021",
@@ -12,19 +21,30 @@ const rawData = {
 		"18.12.2021",
 		"19.12.2021",
 		"20.12.2021",
+		"21.12.2021",
+		"22.12.2021",
+		"23.12.2021",
+		"24.12.2021",
+		"25.12.2021",
+		"26.12.2021",
+		"27.12.2021",
+		"28.12.2021",
+		"29.12.2021",
+		"30.12.2021",
+		"31.12.2021",
 	],
 	assignments: [
-		"Yeşil-1 (15 Saat)",
-		"Yeşil-2 L.H.SEP (15 Saat)",
-		"Sep-1 (16 Saat)",
-		"Sep-2 (16 Saat)",
-		"Sep-3 (16 Saat)",
-		"Pandemi Servis (24 Saat)",
-		"Sarı-1 (24 Saat)",
-		"Sarı-2 (24 Saat)",
-		"Sarı-3 (24 Saat)",
-		"Sarı-4 (24 Saat)",
-		"Sarı-5 (24 Saat)",
+		{ name: "Yeşil-1 (15 Saat)", duration: 15 },
+		{ name: "Yeşil-2 L.H.SEP (15 Saat)", duration: 15 },
+		{ name: "Sep-1 (16 Saat)", duration: 16 },
+		{ name: "Sep-2 (16 Saat)", duration: 16 },
+		{ name: "Sep-3 (16 Saat)", duration: 16 },
+		{ name: "Pandemi Servis (24 Saat)", duration: 24 },
+		{ name: "Sarı-1 (24 Saat)", duration: 24 },
+		{ name: "Sarı-2 (24 Saat)", duration: 24 },
+		{ name: "Sarı-3 (24 Saat)", duration: 24 },
+		{ name: "Sarı-4 (24 Saat)", duration: 24 },
+		{ name: "Sarı-5 (24 Saat)", duration: 24 },
 	],
 	people: [
 		"Alperen G.",
@@ -65,11 +85,12 @@ const rawData = {
 };
 
 class Person {
-	constructor(name, writtenCount = 0, writtenability = 100) {
+	constructor(name, writtenCount = 0, writtenability = 1000, workingHours = 0) {
 		this.name = name;
 		this.writtenCount = writtenCount;
 		this.writtenability = writtenability;
 		this.agenda = [];
+		this.workingHours = workingHours;
 	}
 	increaseWrittenCount() {
 		this.writtenCount++;
@@ -86,8 +107,11 @@ class Person {
 	addWrittenability(number) {
 		this.writtenability += number;
 	}
-	addAssignmentToAgenda({ date, assignment }) {
-		this.agenda.push({ date, assignment });
+	addAssignmentToAgenda(assignment) {
+		this.agenda.push(assignment);
+	}
+	addWorkingHours(number) {
+		this.workingHours += number;
 	}
 	removeFromAgendaByDate(date) {
 		const index = this.agenda.findIndex((el) => el.date === date);
@@ -105,6 +129,12 @@ class Person {
 	}
 	setAgenda(arr) {
 		this.agenda = [...arr];
+	}
+	reset() {
+		this.writtenability = 100;
+		this.agenda = [];
+		this.writtenCount = 0;
+		this.workingHours = 0;
 	}
 }
 

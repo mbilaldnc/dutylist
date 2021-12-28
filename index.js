@@ -16,8 +16,14 @@ const CONSTRAINTS = {
 		let highestWrittenability = Math.max(...helpers.people.map((person) => parseInt(person.writtenability)));
 		// console.log("highestWrittenability", highestWrittenability);
 		// console.log("current persons writtenability", helpers.person.writtenability);
-		if (helpers.person.writtenability === highestWrittenability) return 0;
+		if (helpers.person.writtenability >= highestWrittenability - 1) return 0;
 		return 1;
+	},
+	howCanOneWorkFor24Hours: function (helpers) {
+		let splittedDateString = helpers.currentDate.split(".");
+		let oneDayAgo = new Date(new Date(splittedDateString[2], splittedDateString[1], splittedDateString[0]).getDate() - 1).toLocaleDateString();
+		if (helpers.person.agenda.some((assignment) => assignment.date === oneDayAgo && assignment.duration === 24)) return 1;
+		return 0;
 	},
 };
 
@@ -66,6 +72,14 @@ function generateTable(table, inputData) {
 	}
 }
 
+function pickRandom(people) {
+	return people[randomBetween(0, people.length - 1)];
+}
+
+function randomBetween(min, max) {
+	return Math.round(Math.random() * (max - min) + min);
+}
+
 function generateTableData(rawData) {
 	count++;
 	const tableData = [];
@@ -80,29 +94,29 @@ function generateTableData(rawData) {
 			while (isRestrictedByConstraints(tableData, date, selectedPerson, rawData.people, rawData.assignments)) {
 				console.log("restriction encountered");
 				if (dupPeople.length === 1) {
-					console.log(`${count}. test başarısız.`);
+					console.error(`${count}. test başarısız.`);
 					return 0;
 				}
 				dupPeople.splice(dupPeople.indexOf(selectedPerson), 1);
 				selectedPerson = pickRandom(dupPeople);
 			}
-			row[rawData.assignments[j]] = selectedPerson.name;
+			row[rawData.assignments[j].name] = selectedPerson.name;
 			selectedPerson.increaseWrittenCount();
-			selectedPerson.subtractWrittenability(selectedPerson.writtenCount);
-			selectedPerson.addAssignmentToAgenda({ date: row.date, assignment: rawData.assignments[j] });
+			selectedPerson.subtractWrittenability(rawData.assignments[j].duration + 1);
+			selectedPerson.addWorkingHours(rawData.assignments[j].duration);
+			selectedPerson.addAssignmentToAgenda({ ...rawData.assignments[j], date: row.date });
 		}
 		tableData.push(row);
 	}
 	return tableData;
 }
 
-function pickRandom(people) {
-	return people[randomBetween(0, people.length - 1)];
-}
-
 function write(table_DOM, rawData) {
 	let tableData = generateTableData(rawData);
 	while (tableData === 0) {
+		for (let person of rawData.people) {
+			person.reset();
+		}
 		tableData = generateTableData(rawData);
 	}
 	generateTable(table_DOM, tableData);
@@ -110,51 +124,5 @@ function write(table_DOM, rawData) {
 	console.log("BAŞARILI");
 }
 
-setTimeout(() => {
-	write(table, data);
-	console.log("people", data.people);
-}, 1000);
-
-function randomBetween(min, max) {
-	return Math.round(Math.random() * (max - min) + min);
-}
-
-function pickRandomBestPerson(table_data, currentDate, people, assignments) {
-	shuffle(people);
-	let selectedPerson = findBetterOne(people[0], people);
-	while (isRestrictedByConstraints(table_data, currentDate, selectedPerson, people, assignments)) {
-		selectedPerson = findBetterOne(selectedPerson, people, true);
-	}
-	return selectedPerson;
-}
-
-function findBetterOne(person, people, hasToBeDifferent = false) {
-	shuffle(people);
-	if (hasToBeDifferent && people.length > 1) {
-		const tmpPeople = [...people];
-		tmpPeople.splice(tmpPeople.indexOf(person), 1);
-		return pickRandomBestPerson(tmpPeople);
-	}
-	for (var i = 0; i < people.length; i++) {
-		let comparisonPerson = people[i];
-		if (comparisonPerson.writtenability > person.writtenability) return comparisonPerson;
-	}
-	return person;
-}
-
-function shuffle(array) {
-	let currentIndex = array.length,
-		randomIndex;
-
-	// While there remain elements to shuffle...
-	while (currentIndex != 0) {
-		// Pick a remaining element...
-		randomIndex = Math.floor(Math.random() * currentIndex);
-		currentIndex--;
-
-		// And swap it with the current element.
-		[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-	}
-
-	return array;
-}
+write(table, data);
+console.log("people", data.people);
