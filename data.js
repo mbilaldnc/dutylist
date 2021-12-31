@@ -89,8 +89,12 @@ class Person {
 		this.name = name;
 		this.writtenCount = writtenCount;
 		this.writtenability = writtenability;
+		this.tmpWrittenability = writtenability;
 		this.agenda = [];
 		this.workingHours = workingHours;
+		this.constraints = [];
+		this.isolates = [];
+		this.forbiddenDates = [];
 	}
 	increaseWrittenCount() {
 		this.writtenCount++;
@@ -130,8 +134,33 @@ class Person {
 	setAgenda(arr) {
 		this.agenda = [...arr];
 	}
+	addConstraint(func) {
+		this.constraints.push(func);
+	}
+	isolateFrom(person) {
+		person.isolates.push(this);
+		this.isolates.push(person);
+	}
+	hasIsolates() {
+		return this.isolates.length;
+	}
+	hasForbiddenDates() {
+		return this.forbiddenDates.length;
+	}
+	forbidDate(dateAsString) {
+		this.forbiddenDates.push(dateAsString);
+	}
+	setTmpWrittenability(number) {
+		this.tmpWrittenability = this.writtenability;
+		this.writtenability = number;
+	}
+	turnEnded() {
+		if (this.writtenability === -Infinity) {
+			this.writtenability = this.tmpWrittenability;
+		}
+	}
 	reset() {
-		this.writtenability = 100;
+		this.writtenability = 1000;
 		this.agenda = [];
 		this.writtenCount = 0;
 		this.workingHours = 0;

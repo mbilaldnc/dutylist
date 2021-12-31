@@ -1,17 +1,23 @@
-td {
-	border: 1px black solid;
-}
-
 table {
 	width: 100%;
 	border-collapse: collapse;
 }
 
-th {
-	background-color: lightgray;
+td {
+	border: 1px black solid;
 }
 
-tr > td:first-child {
+td:empty {
+	border: 0;
+	background-color: transparent !important;
+}
+
+th {
+	background-color: lightgray;
+	border: 1px solid black;
+}
+
+table:first-of-type tr > td:first-child {
 	background-color: lightblue;
 }
 
@@ -23,4 +29,11 @@ label {
 input[type="checkbox"] {
 	width: 2em;
 	height: 2em;
+}
+
+#individual-tables {
+	margin-top: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
 }
